@@ -3,6 +3,7 @@ package com.csci.cloud.client;
 import com.csci.cloud.client.common.Const;
 import com.csci.cloud.client.common.JsonUtils;
 import com.csci.cloud.client.common.Utils;
+import com.csci.cloud.client.model.ResponseVo;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import okhttp3.*;
@@ -32,8 +33,8 @@ public class CreditClient {
      * @param headerMap    请求头
      */
     private static ResponseVo executeJson(String httpMethod, String url, String requestBody,
-                                         Map<String, String> queryMap,
-                                         Map<String, String> headerMap) throws Exception {
+                                          Map<String, String> queryMap,
+                                          Map<String, String> headerMap) throws Exception {
 
         RequestBody body = null != requestBody ? getRequestBody(Const.JSON, requestBody) : null;
         url = url + createOrderedUrlParamFromMap(queryMap);

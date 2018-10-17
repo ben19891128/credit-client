@@ -1,4 +1,4 @@
-package com.csci.cloud.client;
+package com.csci.cloud.client.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

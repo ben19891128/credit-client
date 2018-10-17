@@ -1,18 +1,11 @@
 package com.csci.cloud.client.test;
 
 import com.csci.cloud.client.CreditClient;
-import com.csci.cloud.client.ResponseVo;
-import com.csci.cloud.client.common.Const;
+import com.csci.cloud.client.model.ResponseVo;
 import com.csci.cloud.client.common.JsonUtils;
-import com.csci.cloud.client.common.Utils;
 import com.csci.cloud.client.model.MirrorFraud001ReqVo;
 import com.google.common.collect.Maps;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 import org.junit.Test;
-
-import java.util.Map;
 
 /**
  * 个人反欺诈业务.
