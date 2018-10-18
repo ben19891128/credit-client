@@ -1,6 +1,7 @@
 package com.csci.cloud.client.test.credio;
 
 import com.csci.cloud.client.CreditClient;
+import com.csci.cloud.client.common.Const;
 import com.csci.cloud.client.common.JsonUtils;
 import com.csci.cloud.client.model.CredioPlusRegisterVo;
 import com.csci.cloud.client.model.ResponseVo;
@@ -17,10 +18,10 @@ import org.junit.Test;
  */
 public class CredioPlusUserClientTest extends BaseClientTest {
 
-    private static final MediaType MEDIA_TYPE_STREAM = MediaType.parse("application/octet-stream");
+
 
     /**
-     * 登录.
+     * 注册.
      * @throws Exception
      */
     @Test
@@ -31,7 +32,7 @@ public class CredioPlusUserClientTest extends BaseClientTest {
         credioPlusRegisterVo.setRole("CLIENT");
         credioPlusRegisterVo.setUsername("ben.ma");
         credioPlusRegisterVo.setPassword("123445567");
-        ResponseVo responseVo = creditClient.executeJson( uri,
+        ResponseVo responseVo = creditClient.executeJson(uri,
                 "POST",
                 JsonUtils.toJson(credioPlusRegisterVo),
                 Maps.newHashMap(),Maps.newHashMap());
@@ -87,7 +88,7 @@ public class CredioPlusUserClientTest extends BaseClientTest {
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("file", "cert.txt",
-                        RequestBody.create(MEDIA_TYPE_STREAM, rawCert))
+                        RequestBody.create(Const.MEDIA_TYPE_STREAM, rawCert))
                 .build();
         ResponseVo responseVo = creditClient.execute(uri, "POST",requestBody, Maps.newHashMap(), defaultHeaderMap);
         System.out.println(responseVo);
@@ -113,7 +114,7 @@ public class CredioPlusUserClientTest extends BaseClientTest {
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("file", "key.txt",
-                        RequestBody.create(MEDIA_TYPE_STREAM, privateKeyRaw))
+                        RequestBody.create(Const.MEDIA_TYPE_STREAM, privateKeyRaw))
                 .build();
         ResponseVo responseVo = creditClient.execute(uri, "POST",requestBody, Maps.newHashMap(), defaultHeaderMap);
         System.out.println(responseVo);
