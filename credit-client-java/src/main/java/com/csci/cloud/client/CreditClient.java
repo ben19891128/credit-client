@@ -4,6 +4,7 @@ import com.csci.cloud.client.common.Const;
 import com.csci.cloud.client.common.JsonUtils;
 import com.csci.cloud.client.common.Utils;
 import com.csci.cloud.client.model.ResponseVo;
+import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import okhttp3.*;
@@ -25,17 +26,7 @@ public class CreditClient {
             .build();
 
 
-    /**
-     * 发送post请求. Content-Type : application/json .
-     *
-     * @param httpMethod  请求方法 GET,POST,DELETE,PATCH,OPTION
-     * @param url         资源路径
-     * @param requestBody request body
-     * @param queryMap    请求路径参数
-     * @param headerMap   请求头
-     */
-
-    private static ResponseVo execute(String httpMethod, String url, RequestBody requestBody,
+    private static String executeRaw(String httpMethod, String url, RequestBody requestBody,
                                       Map<String, String> queryMap,
                                       Map<String, String> headerMap) throws Exception {
 
@@ -76,24 +67,42 @@ public class CreditClient {
             }
         }
         String body = response.body().string();
-        logger.info(body);
+        return body;
+    }
+
+    /**
+     * 发送post请求. Content-Type : application/json .
+     *
+     * @param httpMethod  请求方法 GET,POST,DELETE,PATCH,OPTION
+     * @param url         资源路径
+     * @param requestBody request body
+     * @param queryMap    请求路径参数
+     * @param headerMap   请求头
+     */
+
+    private static ResponseVo execute(String httpMethod, String url, RequestBody requestBody,
+                                      Map<String, String> queryMap,
+                                      Map<String, String> headerMap) throws Exception {
+
+        String body = executeRaw(httpMethod, url, requestBody, queryMap, headerMap);
         ResponseVo responseVo = JsonUtils.toObj(body, ResponseVo.class);
         return responseVo;
     }
 
-    public static ResponseVo execute(String httpMethod,
-                                     String basePath,
+    public static ResponseVo execute(String basePath,
                                      String uri,
+                                     String httpMethod,
                                      String apiKey,
                                      String secret,
                                      RequestBody requestBody,
-                                     Map<String, String> queryMap) throws Exception {
+                                     Map<String, String> queryMap,
+                                     Map<String,String> headMap) throws Exception {
 
         if (null != queryMap) {
             queryMap = Maps.newHashMap();
         }
         long timestamp = System.currentTimeMillis();
-        Map headMap = new ImmutableMap.Builder().put(Const.API_HEAD_KEY, apiKey)
+         headMap = new ImmutableMap.Builder().putAll(headMap).put(Const.API_HEAD_KEY, apiKey)
                 .put(Const.API_HEAD_TIMESTAMP, timestamp + "")
                 .put(Const.API_HEAD_SIGN,
                         Utils.calSign(apiKey, secret, timestamp,
@@ -101,6 +110,31 @@ public class CreditClient {
                 .build();
         return execute(httpMethod, basePath + uri, requestBody, queryMap, headMap);
     }
+
+
+    public static String download(String basePath,
+                                     String uri,
+                                     String httpMethod,
+                                     String apiKey,
+                                     String secret,
+                                     RequestBody requestBody,
+                                     Map<String, String> queryMap,
+                                     Map<String,String> headMap) throws Exception {
+
+        if (null != queryMap) {
+            queryMap = Maps.newHashMap();
+        }
+        long timestamp = System.currentTimeMillis();
+        headMap = new ImmutableMap.Builder().putAll(headMap).put(Const.API_HEAD_KEY, apiKey)
+                .put(Const.API_HEAD_TIMESTAMP, timestamp + "")
+                .put(Const.API_HEAD_SIGN,
+                        Utils.calSign(apiKey, secret, timestamp,
+                                uri, ImmutableMap.copyOf(queryMap)))
+                .build();
+        return executeRaw(httpMethod, basePath + uri, requestBody, queryMap, headMap);
+    }
+
+
 
     /**
      *
@@ -120,10 +154,11 @@ public class CreditClient {
                                          String apiKey,
                                          String secret,
                                          String requestBody,
-                                         Map<String, String> queryMap) throws Exception {
+                                         Map<String, String> queryMap,
+                                         Map<String,String> headMap) throws Exception {
 
         RequestBody body = null != requestBody ? RequestBody.create(Const.JSON, requestBody) : null;
-        return execute(httpMethod, basePath, uri,  apiKey, secret, body,queryMap);
+        return execute( basePath, uri,httpMethod,  apiKey, secret, body,queryMap,headMap);
     }
 
 
@@ -145,9 +180,9 @@ public class CreditClient {
                                          String apiKey,
                                          String secret,
                                          FormBody formBody,
-                                         Map<String, String> queryMap) throws Exception {
+                                         Map<String, String> queryMap,Map<String,String> headMap) throws Exception {
 
-        return execute(httpMethod, basePath, uri,  apiKey, secret, formBody,queryMap);
+        return execute(basePath, uri, httpMethod,  apiKey, secret, formBody,queryMap,headMap);
     }
 
     /**
