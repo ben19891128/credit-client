@@ -4,16 +4,18 @@ import com.csci.cloud.client.common.Const;
 import com.csci.cloud.client.common.JsonUtils;
 import com.csci.cloud.client.common.Utils;
 import com.csci.cloud.client.model.ResponseVo;
-import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import okhttp3.*;
-import okio.BufferedSink;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class CreditClient {
+
+    private static final Logger logger = LoggerFactory.getLogger(CreditClient.class);
     public final static OkHttpClient okHttpClient = new OkHttpClient
             .Builder()
             .readTimeout(30, TimeUnit.SECONDS)
@@ -26,19 +28,18 @@ public class CreditClient {
     /**
      * 发送post请求. Content-Type : application/json .
      *
-     * @param httpMethod    请求方法
+     * @param httpMethod  请求方法 GET,POST,DELETE,PATCH,OPTION
      * @param url         资源路径
      * @param requestBody request body
-     * @param queryMap     请求路径参数
-     * @param headerMap    请求头
+     * @param queryMap    请求路径参数
+     * @param headerMap   请求头
      */
-    private static ResponseVo executeJson(String httpMethod, String url, String requestBody,
-                                          Map<String, String> queryMap,
-                                          Map<String, String> headerMap) throws Exception {
 
-        RequestBody body = null != requestBody ? getRequestBody(Const.JSON, requestBody) : null;
+    private static ResponseVo execute(String httpMethod, String url, RequestBody requestBody,
+                                      Map<String, String> queryMap,
+                                      Map<String, String> headerMap) throws Exception {
+
         url = url + createOrderedUrlParamFromMap(queryMap);
-
         //组装Headers
         Headers.Builder headerBuilder = new Headers.Builder();
         if (headerMap != null && !headerMap.isEmpty()) {
@@ -48,7 +49,7 @@ public class CreditClient {
         Request request
                 = new Request.Builder()
                 .url(url)
-                .method(httpMethod, body)
+                .method(httpMethod, requestBody)
                 .headers(headerBuilder.build())
                 .build();
 
@@ -66,53 +67,88 @@ public class CreditClient {
                         "HttpClient调用失败"
                                 + ", httpStatus=" + response.code()
                                 + ", URL=" + response.request().url()
-                                + ", 错误信息：" + response.message());
+                                + ", 错误信息：" + repsStr);
 
             } else {
                 throw new RuntimeException("HttpClient调用失败"
                         + ", URL=" + response.request().url()
-                        + "，错误信息：" + responseVo.getErrorMessage());
+                        + "，错误信息：" + responseVo.toString());
             }
         }
-        ResponseVo responseVo = JsonUtils.toObj(response.body().string(), ResponseVo.class);
+        String body = response.body().string();
+        logger.info(body);
+        ResponseVo responseVo = JsonUtils.toObj(body, ResponseVo.class);
         return responseVo;
     }
 
+    public static ResponseVo execute(String httpMethod,
+                                     String basePath,
+                                     String uri,
+                                     String apiKey,
+                                     String secret,
+                                     RequestBody requestBody,
+                                     Map<String, String> queryMap) throws Exception {
 
-    public static ResponseVo executeJson(String basePath, String uri, String httpMethod,String requestBody,
+        if (null != queryMap) {
+            queryMap = Maps.newHashMap();
+        }
+        long timestamp = System.currentTimeMillis();
+        Map headMap = new ImmutableMap.Builder().put(Const.API_HEAD_KEY, apiKey)
+                .put(Const.API_HEAD_TIMESTAMP, timestamp + "")
+                .put(Const.API_HEAD_SIGN,
+                        Utils.calSign(apiKey, secret, timestamp,
+                                uri, ImmutableMap.copyOf(queryMap)))
+                .build();
+        return execute(httpMethod, basePath + uri, requestBody, queryMap, headMap);
+    }
+
+    /**
+     *
+     * @param basePath 请求的地址.
+     * @param uri 请求uri
+     * @param httpMethod 请求方法 GET POST DELETE,OPTION等.
+     * @param requestBody 请求body json 字符串.
+     * @param apiKey 开发者key
+     * @param secret 开发者秘钥
+     * @param queryMap url请求参数
+     * @return
+     * @throws Exception
+     */
+    public static ResponseVo executeJson(String basePath,
+                                         String uri,
+                                         String httpMethod,
                                          String apiKey,
                                          String secret,
+                                         String requestBody,
                                          Map<String, String> queryMap) throws Exception {
 
-        long timestamp = System.currentTimeMillis();
-        Map headMap = new ImmutableMap.Builder().put(Const.API_HEAD_KEY,apiKey)
-                .put(Const.API_HEAD_TIMESTAMP,timestamp+"")
-                .put(Const.API_HEAD_SIGN, Utils.calSign(apiKey,secret,timestamp,uri,ImmutableMap.copyOf(queryMap))).build();
-
-        return executeJson(httpMethod,basePath+uri,requestBody,queryMap,headMap);
-
+        RequestBody body = null != requestBody ? RequestBody.create(Const.JSON, requestBody) : null;
+        return execute(httpMethod, basePath, uri,  apiKey, secret, body,queryMap);
     }
 
 
+    /**
+     *
+     * @param basePath 请求的地址.
+     * @param uri 请求uri
+     * @param httpMethod 请求方法 GET POST DELETE,OPTION等.
+     * @param formBody 请求表单数据.
+     * @param apiKey 开发者key
+     * @param secret 开发者秘钥
+     * @param queryMap url请求参数
+     * @return
+     * @throws Exception
+     */
+    public static ResponseVo executeForm(String basePath,
+                                         String uri,
+                                         String httpMethod,
+                                         String apiKey,
+                                         String secret,
+                                         FormBody formBody,
+                                         Map<String, String> queryMap) throws Exception {
 
-    private static RequestBody getRequestBody(MediaType mediaType, String requestBody) {
-        return new RequestBody() {
-            @Override
-            public MediaType contentType() {
-                return mediaType;
-            }
-
-            @Override
-            public void writeTo(BufferedSink sink) throws IOException {
-                if (requestBody != null && requestBody.length() > 0) {
-                    sink.writeString(requestBody, Charsets.UTF_8);
-                }
-                sink.flush();
-            }
-        };
-
+        return execute(httpMethod, basePath, uri,  apiKey, secret, formBody,queryMap);
     }
-
 
     /**
      * 根据map组装成url参数，参数的顺序按照key排序.

@@ -14,8 +14,17 @@ import java.util.concurrent.TimeUnit;
 import static com.csci.cloud.client.common.Const.API_HEAD_KEY;
 import static com.csci.cloud.client.common.Const.API_HEAD_TIMESTAMP;
 
-public class Utils {
+public final class Utils {
 
+    /**
+     * 计算签名.
+     * @param apiKey
+     * @param secret
+     * @param timestamp
+     * @param uri
+     * @param immutableQueryMap
+     * @return
+     */
     public static String calSign(String apiKey,
                                  String secret,
                                  Long timestamp, String uri,

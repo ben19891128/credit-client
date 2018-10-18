@@ -24,7 +24,7 @@ public class CloudMirrorClientTest extends BaseClientTest {
         reqVo.setMobile("15618579663");
         String uri = "/api/v1/mirror/anti-fraud/001";
 
-        ResponseVo responseVo = CreditClient.executeJson(HOST, uri, "POST", JsonUtils.toJson(reqVo), API_KEY, SECRET, Maps.newHashMap());
+        ResponseVo responseVo = CreditClient.executeJson(HOST, uri, "POST",  API_KEY, SECRET,JsonUtils.toJson(reqVo), Maps.newHashMap());
         System.out.println(responseVo);
     }
 }

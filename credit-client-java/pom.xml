@@ -20,6 +20,8 @@
             <artifactId>guava</artifactId>
             <version>20.0</version>
         </dependency>
+
+        <!-- http client 工具-->
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
@@ -51,7 +53,7 @@
             <version>1.7.25</version>
         </dependency>
 
-
+        <!--单元测试-->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
