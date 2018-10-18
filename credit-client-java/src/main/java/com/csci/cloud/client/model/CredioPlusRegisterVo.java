@@ -1,5 +1,8 @@
 package com.csci.cloud.client.model;
 
+/**
+ * 用户注册.
+ */
 public class CredioPlusRegisterVo {
 
     /**

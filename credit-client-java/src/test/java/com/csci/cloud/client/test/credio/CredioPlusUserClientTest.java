@@ -1,7 +1,6 @@
 package com.csci.cloud.client.test.credio;
 
 import com.csci.cloud.client.CreditClient;
-import com.csci.cloud.client.common.Const;
 import com.csci.cloud.client.common.JsonUtils;
 import com.csci.cloud.client.model.CredioPlusRegisterVo;
 import com.csci.cloud.client.model.ResponseVo;
@@ -11,29 +10,14 @@ import okhttp3.FormBody;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
-import org.junit.Before;
 import org.junit.Test;
-
-import java.util.HashMap;
 
 /**
  * 区块链单元测试类.
  */
 public class CredioPlusUserClientTest extends BaseClientTest {
-    private static String HOST = "http://localhost:8020";
-
-    private String token = "bearer b8ccc00b-d8bd-4306-a7b4-a7447d70221e";
 
     private static final MediaType MEDIA_TYPE_STREAM = MediaType.parse("application/octet-stream");
-
-    HashMap<String, String> headerMap = Maps.newHashMap();
-
-    @Before
-    public void before() {
-
-        headerMap.put(Const.CREDIO_PLUS_CLOUD_TOKEN_HEADER,token);
-    }
-
 
     /**
      * 登录.
@@ -47,8 +31,9 @@ public class CredioPlusUserClientTest extends BaseClientTest {
         credioPlusRegisterVo.setRole("CLIENT");
         credioPlusRegisterVo.setUsername("ben.ma");
         credioPlusRegisterVo.setPassword("123445567");
-        ResponseVo responseVo = CreditClient.executeJson(HOST, uri,"POST",
-                API_KEY, SECRET, JsonUtils.toJson(credioPlusRegisterVo),
+        ResponseVo responseVo = creditClient.executeJson( uri,
+                "POST",
+                JsonUtils.toJson(credioPlusRegisterVo),
                 Maps.newHashMap(),Maps.newHashMap());
         System.out.println(responseVo);
     }
@@ -67,7 +52,7 @@ public class CredioPlusUserClientTest extends BaseClientTest {
                 .add("grant_type","password")
                 .build();
 
-        ResponseVo responseVo = CreditClient.executeForm(HOST, uri,"POST", API_KEY, SECRET, formBody, Maps.newHashMap(),Maps.newHashMap());
+        ResponseVo responseVo = creditClient.executeForm(uri,"POST",formBody, Maps.newHashMap(),Maps.newHashMap());
         System.out.println(responseVo);
     }
 
@@ -78,7 +63,7 @@ public class CredioPlusUserClientTest extends BaseClientTest {
     @Test
     public void getUserCount() throws Exception {
         String uri = "/chain/api/user/client/user/count";
-        ResponseVo responseVo = CreditClient.executeJson(HOST,uri,"GET",API_KEY,SECRET,null,Maps.newHashMap(),headerMap);
+        ResponseVo responseVo = creditClient.executeJson(uri,"GET",null,Maps.newHashMap(), defaultHeaderMap);
         System.out.println(responseVo);
     }
 
@@ -104,7 +89,7 @@ public class CredioPlusUserClientTest extends BaseClientTest {
                 .addFormDataPart("file", "cert.txt",
                         RequestBody.create(MEDIA_TYPE_STREAM, rawCert))
                 .build();
-        ResponseVo responseVo = CreditClient.execute(HOST, uri, "POST", API_KEY, SECRET, requestBody, Maps.newHashMap(), headerMap);
+        ResponseVo responseVo = creditClient.execute(uri, "POST",requestBody, Maps.newHashMap(), defaultHeaderMap);
         System.out.println(responseVo);
     }
 
@@ -130,7 +115,7 @@ public class CredioPlusUserClientTest extends BaseClientTest {
                 .addFormDataPart("file", "key.txt",
                         RequestBody.create(MEDIA_TYPE_STREAM, privateKeyRaw))
                 .build();
-        ResponseVo responseVo = CreditClient.execute(HOST, uri, "POST", API_KEY, SECRET, requestBody, Maps.newHashMap(), headerMap);
+        ResponseVo responseVo = creditClient.execute(uri, "POST",requestBody, Maps.newHashMap(), defaultHeaderMap);
         System.out.println(responseVo);
     }
 
@@ -140,7 +125,7 @@ public class CredioPlusUserClientTest extends BaseClientTest {
      */
     private String downLoadPrivateKeyRaw() throws Exception {
         String uri = "/chain/api/user/client/user/privateKey";
-        String rawText = CreditClient.download(HOST,uri,"GET",API_KEY,SECRET,null,Maps.newHashMap(),headerMap);
+        String rawText = creditClient.download(uri,"GET",null,Maps.newHashMap(), defaultHeaderMap);
         return rawText;
     }
 
@@ -151,7 +136,7 @@ public class CredioPlusUserClientTest extends BaseClientTest {
      */
     private String downLoadCertificateRaw() throws Exception {
         String uri = "/chain/api/user/client/user/cert";
-        String rawText = CreditClient.download(HOST,uri,"GET",API_KEY,SECRET,null,Maps.newHashMap(),headerMap);
+        String rawText = creditClient.download(uri,"GET",null,Maps.newHashMap(), defaultHeaderMap);
         return rawText;
     }
 

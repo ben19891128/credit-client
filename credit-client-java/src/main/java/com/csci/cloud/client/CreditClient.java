@@ -4,29 +4,50 @@ import com.csci.cloud.client.common.Const;
 import com.csci.cloud.client.common.JsonUtils;
 import com.csci.cloud.client.common.Utils;
 import com.csci.cloud.client.model.ResponseVo;
-import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import okhttp3.*;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 信用云http 客户端工具类.
+ */
 public class CreditClient {
 
     private static final Logger logger = LoggerFactory.getLogger(CreditClient.class);
-    public final static OkHttpClient okHttpClient = new OkHttpClient
-            .Builder()
-            .readTimeout(30, TimeUnit.SECONDS)
-            .writeTimeout(30, TimeUnit.SECONDS)
-            .connectTimeout(5, TimeUnit.SECONDS)
-            .retryOnConnectionFailure(true)
-            .build();
+    public  OkHttpClient okHttpClient;
 
+    public static final long DEFAULT_READ_TIMEOUT = 30*1000;
+    public static final long DEFAULT_WRITE_TIMEOUT = 30*1000;
+    public static final long DEFAULT_CONNECT_TIMEOUT = 5*1000;
 
-    private static String executeRaw(String httpMethod, String url, RequestBody requestBody,
+    private String apiKey;
+    private String basePath;
+    private String secret;
+
+    private CreditClient(String apiKey,String secret,String basePath,Long readTimeout,Long writeTimeout,Long connectTimeout) {
+        this.apiKey = apiKey;
+        this.basePath = basePath;
+        this.secret = secret;
+        okHttpClient = new OkHttpClient
+                .Builder()
+                .readTimeout(readTimeout, TimeUnit.MILLISECONDS)
+                .writeTimeout(writeTimeout, TimeUnit.MILLISECONDS)
+                .connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
+                .retryOnConnectionFailure(true)
+                .build();
+    }
+
+    private CreditClient(String apiKey,String secret,String basePath) {
+        this(apiKey,secret,basePath, DEFAULT_READ_TIMEOUT,DEFAULT_WRITE_TIMEOUT,DEFAULT_CONNECT_TIMEOUT);
+    }
+
+    private  String executeRaw(String httpMethod, String url, RequestBody requestBody,
                                       Map<String, String> queryMap,
                                       Map<String, String> headerMap) throws Exception {
 
@@ -52,6 +73,7 @@ public class CreditClient {
         if (!response.isSuccessful()) {
             //解析错误信息
             String repsStr = response.body().string();
+            logger.warn(repsStr);
             ResponseVo responseVo = JsonUtils.toObj(repsStr, ResponseVo.class);
             if (responseVo == null || responseVo.getCode() == null) {
                 throw new RuntimeException(
@@ -67,33 +89,13 @@ public class CreditClient {
             }
         }
         String body = response.body().string();
+
         return body;
     }
 
-    /**
-     * 发送post请求. Content-Type : application/json .
-     *
-     * @param httpMethod  请求方法 GET,POST,DELETE,PATCH,OPTION
-     * @param url         资源路径
-     * @param requestBody request body
-     * @param queryMap    请求路径参数
-     * @param headerMap   请求头
-     */
 
-    private static ResponseVo execute(String httpMethod, String url, RequestBody requestBody,
-                                      Map<String, String> queryMap,
-                                      Map<String, String> headerMap) throws Exception {
-
-        String body = executeRaw(httpMethod, url, requestBody, queryMap, headerMap);
-        ResponseVo responseVo = JsonUtils.toObj(body, ResponseVo.class);
-        return responseVo;
-    }
-
-    public static ResponseVo execute(String basePath,
-                                     String uri,
+    public  ResponseVo execute(String uri,
                                      String httpMethod,
-                                     String apiKey,
-                                     String secret,
                                      RequestBody requestBody,
                                      Map<String, String> queryMap,
                                      Map<String,String> headMap) throws Exception {
@@ -108,15 +110,24 @@ public class CreditClient {
                         Utils.calSign(apiKey, secret, timestamp,
                                 uri, ImmutableMap.copyOf(queryMap)))
                 .build();
-        return execute(httpMethod, basePath + uri, requestBody, queryMap, headMap);
+         String body = executeRaw(httpMethod, basePath + uri, requestBody, queryMap, headMap);
+        ResponseVo responseVo = JsonUtils.toObj(body, ResponseVo.class);
+        return responseVo;
     }
 
 
-    public static String download(String basePath,
-                                     String uri,
+    /**
+     * 下载文件
+     * @param uri
+     * @param httpMethod
+     * @param requestBody
+     * @param queryMap
+     * @param headMap
+     * @return 返回下载内容字符串.
+     * @throws Exception
+     */
+    public  String download(String uri,
                                      String httpMethod,
-                                     String apiKey,
-                                     String secret,
                                      RequestBody requestBody,
                                      Map<String, String> queryMap,
                                      Map<String,String> headMap) throws Exception {
@@ -138,51 +149,39 @@ public class CreditClient {
 
     /**
      *
-     * @param basePath 请求的地址.
      * @param uri 请求uri
      * @param httpMethod 请求方法 GET POST DELETE,OPTION等.
-     * @param requestBody 请求body json 字符串.
-     * @param apiKey 开发者key
-     * @param secret 开发者秘钥
+     * @param bodyRaw 请求body json 字符串.
      * @param queryMap url请求参数
      * @return
      * @throws Exception
      */
-    public static ResponseVo executeJson(String basePath,
-                                         String uri,
+    public  ResponseVo executeJson(String uri,
                                          String httpMethod,
-                                         String apiKey,
-                                         String secret,
-                                         String requestBody,
+                                         String bodyRaw,
                                          Map<String, String> queryMap,
                                          Map<String,String> headMap) throws Exception {
 
-        RequestBody body = null != requestBody ? RequestBody.create(Const.JSON, requestBody) : null;
-        return execute( basePath, uri,httpMethod,  apiKey, secret, body,queryMap,headMap);
+        RequestBody requestBody = null != bodyRaw ? RequestBody.create(Const.JSON, bodyRaw) : null;
+        return execute( uri, httpMethod,requestBody, queryMap, headMap);
     }
 
 
     /**
      *
-     * @param basePath 请求的地址.
      * @param uri 请求uri
      * @param httpMethod 请求方法 GET POST DELETE,OPTION等.
      * @param formBody 请求表单数据.
-     * @param apiKey 开发者key
-     * @param secret 开发者秘钥
      * @param queryMap url请求参数
      * @return
      * @throws Exception
      */
-    public static ResponseVo executeForm(String basePath,
-                                         String uri,
-                                         String httpMethod,
-                                         String apiKey,
-                                         String secret,
-                                         FormBody formBody,
-                                         Map<String, String> queryMap,Map<String,String> headMap) throws Exception {
+    public  ResponseVo executeForm(String uri,
+                                   String httpMethod,
+                                   FormBody formBody,
+                                   Map<String, String> queryMap,Map<String,String> headMap) throws Exception {
 
-        return execute(basePath, uri, httpMethod,  apiKey, secret, formBody,queryMap,headMap);
+        return execute(uri,httpMethod,formBody,queryMap,headMap);
     }
 
     /**
@@ -201,5 +200,55 @@ public class CreditClient {
                 .forEach(k -> params.append("&").append(k.trim()).append("=")
                         .append(queryMap.get(k).toString().trim()));
         return "?" + params.subSequence(1, params.length()).toString();
+    }
+
+
+    public static class Builder {
+        private String apiKey;
+        private String basePath;
+        private String secret;
+        private Long readTimeout;
+        private Long writeTimeout;
+        private Long connectTimeout;
+
+        public Builder apiKey(String apiKey) {
+            this.apiKey = apiKey;
+            return this;
+        }
+        public Builder secret(String secret) {
+            this.secret = secret;
+            return this;
+        }
+
+        public Builder basePath(String basePath) {
+            this.basePath = basePath;
+            return this;
+        }
+
+        public Builder readTimeout(Long readTimeout) {
+            this.readTimeout =readTimeout;
+            return this;
+        }
+
+        public Builder writeTimeout(Long writeTimeout) {
+            this.writeTimeout = writeTimeout;
+            return this;
+        }
+
+        public Builder connectTimeout(Long connectTimeout) {
+            this.connectTimeout = connectTimeout;
+            return this;
+        }
+        public CreditClient build() {
+            if (StringUtils.isBlank(apiKey) || StringUtils.isBlank(secret) || StringUtils.isBlank(basePath)) {
+                throw new RuntimeException("apiKey,secret,basePath must not be blank");
+            }
+            if (null == readTimeout) readTimeout = DEFAULT_READ_TIMEOUT;
+            if (null == writeTimeout) writeTimeout = DEFAULT_WRITE_TIMEOUT;
+            if (null == connectTimeout) connectTimeout = DEFAULT_CONNECT_TIMEOUT;
+            CreditClient creditClient = new CreditClient(apiKey,secret,basePath,readTimeout,writeTimeout,connectTimeout);
+            return creditClient;
+        }
+
     }
 }
