@@ -16,9 +16,7 @@ import org.junit.Test;
 /**
  * 区块链单元测试类.
  */
-public class CredioPlusUserClientTest extends BaseClientTest {
-
-
+public class CredioPlusUserClientTest extends AbstractCredioPushTest {
 
     /**
      * 注册.

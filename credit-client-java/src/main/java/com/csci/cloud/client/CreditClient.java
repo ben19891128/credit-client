@@ -97,20 +97,20 @@ public class CreditClient {
     public  ResponseVo execute(String uri,
                                      String httpMethod,
                                      RequestBody requestBody,
-                                     Map<String, String> queryMap,
+                                     Map<String, String> paraMap,
                                      Map<String,String> headMap) throws Exception {
 
-        if (null != queryMap) {
-            queryMap = Maps.newHashMap();
+        if (null == paraMap) {
+            paraMap = Maps.newHashMap();
         }
         long timestamp = System.currentTimeMillis();
          headMap = new ImmutableMap.Builder().putAll(headMap).put(Const.API_HEAD_KEY, apiKey)
                 .put(Const.API_HEAD_TIMESTAMP, timestamp + "")
                 .put(Const.API_HEAD_SIGN,
                         Utils.calSign(apiKey, secret, timestamp,
-                                uri, ImmutableMap.copyOf(queryMap)))
+                                uri, ImmutableMap.copyOf(paraMap)))
                 .build();
-         String body = executeRaw(httpMethod, basePath + uri, requestBody, queryMap, headMap);
+         String body = executeRaw(httpMethod, basePath + uri, requestBody, paraMap, headMap);
         ResponseVo responseVo = JsonUtils.toObj(body, ResponseVo.class);
         return responseVo;
     }
@@ -152,18 +152,18 @@ public class CreditClient {
      * @param uri 请求uri
      * @param httpMethod 请求方法 GET POST DELETE,OPTION等.
      * @param bodyRaw 请求body json 字符串.
-     * @param queryMap url请求参数
+     * @param paraMap url请求参数
      * @return
      * @throws Exception
      */
     public  ResponseVo executeJson(String uri,
                                          String httpMethod,
                                          String bodyRaw,
-                                         Map<String, String> queryMap,
+                                         Map<String, String> paraMap,
                                          Map<String,String> headMap) throws Exception {
 
         RequestBody requestBody = null != bodyRaw ? RequestBody.create(Const.JSON, bodyRaw) : null;
-        return execute( uri, httpMethod,requestBody, queryMap, headMap);
+        return execute( uri, httpMethod,requestBody, paraMap, headMap);
     }
 
 
