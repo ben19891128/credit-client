@@ -5,6 +5,7 @@ import com.csci.cloud.client.model.ResponseVo;
 import com.csci.cloud.client.common.JsonUtils;
 import com.csci.cloud.client.model.MirrorFraud001ReqVo;
 import com.google.common.collect.Maps;
+import java.util.HashMap;
 import org.junit.Test;
 
 /**
@@ -19,13 +20,12 @@ public class CloudMirrorClientTest extends BaseClientTest {
         MirrorFraud001ReqVo reqVo = new MirrorFraud001ReqVo();
 
         reqVo.setIdNo("341225198906274952");
-        reqVo.setName("马传林");
+        reqVo.setName("马化腾");
         reqVo.setOrgName("腾通讯");
         reqVo.setMobile("15618579663");
         String uri = "/api/v1/mirror/anti-fraud/001";
-
-        ResponseVo responseVo = creditClient.executeJson(uri, "POST",JsonUtils.toJson(reqVo), Maps.newHashMap(),Maps.newHashMap());
-
+        HashMap<String, String> queryMap = Maps.newHashMap();
+        ResponseVo responseVo = creditClient.executeJson(uri, "POST",JsonUtils.toJson(reqVo), queryMap,Maps.newHashMap());
         System.out.println(responseVo);
     }
 }

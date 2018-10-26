@@ -16,7 +16,6 @@ public class CredioPushAssetQueryClientTest extends AbstractCredioPushTest {
   public void queryAsset() throws Exception {
     String assetId = "RQoPSZUYQHjDYbWXfxYggIzbXHkWopOt";
     String uri = "/chain/api/es-query/client/assetOnChain/findLatestStatusAssetDetailByAssetId";
-
     Map<String, String> paraMap = Maps.newHashMap();
     paraMap.put("assetId",assetId);
     paraMap.put("productName","1234");
