@@ -103,6 +103,9 @@ public class CreditClient {
         if (null == paraMap) {
             paraMap = Maps.newHashMap();
         }
+        if (null == headMap) {
+            headMap = Maps.newHashMap();
+        }
         long timestamp = System.currentTimeMillis();
          headMap = new ImmutableMap.Builder().putAll(headMap).put(Const.API_HEAD_KEY, apiKey)
                 .put(Const.API_HEAD_TIMESTAMP, timestamp + "")
