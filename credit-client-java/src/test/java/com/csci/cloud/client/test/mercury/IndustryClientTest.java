@@ -20,7 +20,7 @@ public class IndustryClientTest extends BaseClientTest {
     adminPenaltyReqVo.setCompanyName("上海申能星火热电有限责任公司");
     ResponseVo responseVo = creditClient
         .executeJson(uri, "POST", JsonUtils.toJson(adminPenaltyReqVo), null, null);
-    System.out.println(responseVo);
+    System.out.println(JsonUtils.toJson(responseVo));
   }
 
   /**
@@ -34,7 +34,7 @@ public class IndustryClientTest extends BaseClientTest {
     ResponseVo responseVo = creditClient
         .executeJson(uri, "POST", JsonUtils.toJson(bondDefaultsReqVo), null, null);
 
-    System.out.println(responseVo);
+    System.out.println(JsonUtils.toJson(responseVo));
 
   }
 
@@ -49,7 +49,7 @@ public class IndustryClientTest extends BaseClientTest {
     ResponseVo responseVo = creditClient
         .executeJson(uri, "POST", JsonUtils.toJson(frozenShareReqVo), null, null);
 
-    System.out.println(responseVo);
+    System.out.println(JsonUtils.toJson(responseVo));
 
   }
 
@@ -65,7 +65,7 @@ public class IndustryClientTest extends BaseClientTest {
     ResponseVo responseVo = creditClient
         .executeJson(uri, "POST", JsonUtils.toJson(baseReqVo), null, null);
 
-    System.out.println(responseVo);
+    System.out.println(JsonUtils.toJson(responseVo));
   }
 
   /**
@@ -80,7 +80,7 @@ public class IndustryClientTest extends BaseClientTest {
     ResponseVo responseVo = creditClient
         .executeJson(uri, "POST", JsonUtils.toJson(baseReqVo), null, null);
 
-    System.out.println(responseVo);
+    System.out.println(JsonUtils.toJson(responseVo));
   }
 
   /**
@@ -95,7 +95,7 @@ public class IndustryClientTest extends BaseClientTest {
     ResponseVo responseVo = creditClient
         .executeJson(uri, "POST", JsonUtils.toJson(baseReqVo), null, null);
 
-    System.out.println(responseVo);
+    System.out.println(JsonUtils.toJson(responseVo));
   }
 
   /**
@@ -110,7 +110,7 @@ public class IndustryClientTest extends BaseClientTest {
     ResponseVo responseVo = creditClient
         .executeJson(uri, "POST", JsonUtils.toJson(baseReqVo), null, null);
 
-    System.out.println(responseVo);
+    System.out.println(JsonUtils.toJson(responseVo));
   }
 
 
@@ -126,7 +126,7 @@ public class IndustryClientTest extends BaseClientTest {
     ResponseVo responseVo = creditClient
         .executeJson(uri, "POST", JsonUtils.toJson(baseReqVo), null, null);
 
-    System.out.println(responseVo);
+    System.out.println(JsonUtils.toJson(responseVo));
   }
 
   /**
@@ -141,7 +141,7 @@ public class IndustryClientTest extends BaseClientTest {
     ResponseVo responseVo = creditClient
         .executeJson(uri, "POST", JsonUtils.toJson(baseReqVo), null, null);
 
-    System.out.println(responseVo);
+    System.out.println(JsonUtils.toJson(responseVo));
   }
 
   /**
@@ -156,7 +156,7 @@ public class IndustryClientTest extends BaseClientTest {
     ResponseVo responseVo = creditClient
         .executeJson(uri, "POST", JsonUtils.toJson(baseReqVo), null, null);
 
-    System.out.println(responseVo);
+    System.out.println(JsonUtils.toJson(responseVo));
   }
 
 
