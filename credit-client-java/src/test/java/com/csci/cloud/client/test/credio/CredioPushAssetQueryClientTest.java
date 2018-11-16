@@ -23,7 +23,7 @@ public class CredioPushAssetQueryClientTest extends AbstractCredioPushTest {
         "GET",
         null,
         paraMap,
-        defaultHeaderMap);
+        initLoginMap());
     System.out.println(responseVo);
   }
 

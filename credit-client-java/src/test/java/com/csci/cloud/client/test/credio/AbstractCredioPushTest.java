@@ -11,11 +11,13 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.hash.Hashing;
 import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
+import org.junit.Test;
 
 public class AbstractCredioPushTest extends BaseClientTest {
-  private String token = "bearer 2460bbb3-010b-4bbc-881f-372274fc8fb4";
+  protected String token = null;
 
   public static final String CERT_DEMO = "-----BEGIN CERTIFICATE-----\n" +
       "MIICFDCCAbugAwIBAgIQXaC5je7igJQYWo++E2OkcjAKBggqhkjOPQQDAjBlMQsw\n" +
@@ -41,10 +43,36 @@ public class AbstractCredioPushTest extends BaseClientTest {
 
   protected HashMap<String, String> defaultHeaderMap = Maps.newHashMap();
 
+
   @Before
   public void before() {
+    String login = login();
+    defaultHeaderMap.put(Const.CREDIO_PLUS_CLOUD_TOKEN_HEADER,login);
+  }
+  public Map initLoginMap() {
+    return defaultHeaderMap;
+  }
 
-    defaultHeaderMap.put(Const.CREDIO_PLUS_CLOUD_TOKEN_HEADER,token);
+  /**
+   * 登录.
+   * @throws Exception
+   */
+  protected String login(){
+    String uri = "/chain/api/user/open/login";
+
+    Map loginReqMap = Maps.newHashMap();
+    loginReqMap.put("username","ADMIN");
+    loginReqMap.put("password","adminpw");
+
+    ResponseVo responseVo = null;
+    try {
+      responseVo = creditClient.executeJson(uri,"POST", JsonUtils.toJson(loginReqMap), Maps.newHashMap(),Maps.newHashMap());
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    Map<String, Object> resultMap = JsonUtils
+        .jsonToMap(JsonUtils.toJson(responseVo.getData()));
+    return "Bearer "+(String) resultMap.get("accessToken");
   }
 
 
@@ -67,7 +95,7 @@ public class AbstractCredioPushTest extends BaseClientTest {
         "POST",
         JsonUtils.toJson(Lists.newArrayList(credioPlushIssueVo)),
         Maps.newHashMap(),
-        defaultHeaderMap);
+        initLoginMap());
     return randomAssetId;
   }
 }

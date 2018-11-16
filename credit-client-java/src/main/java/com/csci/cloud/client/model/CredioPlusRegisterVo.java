@@ -8,31 +8,15 @@ public class CredioPlusRegisterVo {
     /**
      * ⽤用户所属的affiliationId, 由具体场景确定.
      */
-    private Integer blockchainAffiliationId;
+    private Integer businessAffiliationId;
 
-    /**
-     * ⽤用户⻆角⾊色, 必须为CLIENT.
-     */
-    private String role;
+
 
     private String username;
     private String password;
 
-    public Integer getBlockchainAffiliationId() {
-        return blockchainAffiliationId;
-    }
 
-    public void setBlockchainAffiliationId(Integer blockchainAffiliationId) {
-        this.blockchainAffiliationId = blockchainAffiliationId;
-    }
 
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
 
     public String getUsername() {
         return username;
@@ -48,5 +32,13 @@ public class CredioPlusRegisterVo {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Integer getBusinessAffiliationId() {
+        return businessAffiliationId;
+    }
+
+    public void setBusinessAffiliationId(Integer businessAffiliationId) {
+        this.businessAffiliationId = businessAffiliationId;
     }
 }
