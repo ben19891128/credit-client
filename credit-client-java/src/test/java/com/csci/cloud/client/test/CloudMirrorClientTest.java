@@ -37,7 +37,7 @@ public class CloudMirrorClientTest extends BaseClientTest {
     String uri = "/api/v1/mirror/credit-scoring";
     CreditScoreReqVo reqVo = new CreditScoreReqVo();
     reqVo.setIdNo("3412258198906275950");
-    reqVo.setMobile("15618579662");
+    reqVo.setMobile("15618579664");
     reqVo.setName("马传林");
     ResponseVo responseVo = creditClient
         .executeJson(uri, "POST", JsonUtils.toJson(reqVo),Maps.newHashMap() , Maps.newHashMap());
