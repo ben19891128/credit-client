@@ -106,7 +106,7 @@ public class CreditClient {
         if (null == headMap) {
             headMap = Maps.newHashMap();
         }
-        long timestamp = System.currentTimeMillis();
+        long timestamp = System.currentTimeMillis()/1000;
          headMap = new ImmutableMap.Builder().putAll(headMap).put(Const.API_HEAD_KEY, apiKey)
                 .put(Const.API_HEAD_TIMESTAMP, timestamp + "")
                 .put(Const.API_HEAD_SIGN,
@@ -138,7 +138,7 @@ public class CreditClient {
         if (null != queryMap) {
             queryMap = Maps.newHashMap();
         }
-        long timestamp = System.currentTimeMillis();
+        long timestamp = System.currentTimeMillis()/1000; //转换为秒.
         headMap = new ImmutableMap.Builder().putAll(headMap).put(Const.API_HEAD_KEY, apiKey)
                 .put(Const.API_HEAD_TIMESTAMP, timestamp + "")
                 .put(Const.API_HEAD_SIGN,
